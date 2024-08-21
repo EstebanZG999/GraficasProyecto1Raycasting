@@ -2,15 +2,21 @@
 
 Welcome to the **Cuphead Maze Game**! This is a 3D maze game with a Cuphead theme, where you can navigate through a maze, avoid enemies, and enjoy the unique Cuphead-style graphics.
 
+
+## Video Demo
+
+Check out a demo of the game on YouTube:
+
+[![Cuphead Maze Game Demo](https://youtu.be/wFG6eMvoMhU)
+
+
 ## Table of Contents
 
 - [Features](#features)
 - [Installation](#installation)
-- [Usage](#usage)
 - [Controls](#controls)
 - [Project Structure](#project-structure)
 - [Credits](#credits)
-- [License](#license)
 
 ## Features
 
