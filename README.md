@@ -5,9 +5,7 @@ Welcome to the **Cuphead Maze Game**! This is a 3D maze game with a Cuphead them
 
 ## Video Demo
 
-Check out a demo of the game on YouTube:
-
-[![Cuphead Maze Game Demo](https://youtu.be/wFG6eMvoMhU)
+[Check out a demo of the game on YouTube:](https://youtu.be/wFG6eMvoMhU)
 
 
 ## Table of Contents
