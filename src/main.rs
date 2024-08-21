@@ -16,9 +16,10 @@ use std::sync::Arc;
 use audio::AudioPlayer;
 use std::time::{Duration, Instant}; 
 use rusttype::{Font, Scale};
+use image::{DynamicImage, GenericImageView};
 
 const WIDTH: usize = 1040;
-const HEIGHT: usize = 900;
+const HEIGHT: usize = 800;
 
 static WALL1: Lazy<Arc<Texture>> = Lazy::new(|| Arc::new(Texture::new("sprites/wall4.webp")));
 static WALL2: Lazy<Arc<Texture>> = Lazy::new(|| Arc::new(Texture::new("sprites/wall4.webp")));
@@ -343,6 +344,22 @@ fn render_text(
 }
 
 
+fn load_frame(file_path: &str) -> DynamicImage {
+    image::open(file_path).expect("Failed to load frame")
+}
+
+fn render_frame(framebuffer: &mut Vec<u32>, frame: &DynamicImage) {
+    let frame_rgb = frame.to_rgba8();
+    for y in 0..HEIGHT {
+        for x in 0..WIDTH {
+            if x < frame.width() as usize && y < frame.height() as usize {
+                let pixel = frame_rgb.get_pixel(x as u32, y as u32);
+                let color = ((pixel[3] as u32) << 24) | ((pixel[0] as u32) << 16) | ((pixel[1] as u32) << 8) | (pixel[2] as u32);
+                framebuffer[y * WIDTH + x] = color;
+            }
+        }
+    }
+}
 
 fn main() {
     let mut window = Window::new(
@@ -358,12 +375,50 @@ fn main() {
     let mut framebuffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
     let block_size = 80;
 
-    // música de fondo
+    let frames = vec![
+        load_frame("assets/introframe1.jpeg").resize_exact(WIDTH as u32, HEIGHT as u32, image::imageops::FilterType::Lanczos3),
+        load_frame("assets/introframe2.jpeg").resize_exact(WIDTH as u32, HEIGHT as u32, image::imageops::FilterType::Lanczos3),
+        load_frame("assets/introframe3.jpeg").resize_exact(WIDTH as u32, HEIGHT as u32, image::imageops::FilterType::Lanczos3),
+    ];
+
+    let mut frame_index = 0;
+    let mut last_frame_time = Instant::now();
+
+    // Bucle de bienvenida
+    while window.is_open() && !window.is_key_down(Key::Enter) {
+        if last_frame_time.elapsed() >= Duration::from_millis(500) {
+            frame_index = (frame_index + 1) % frames.len();
+            last_frame_time = Instant::now();
+        }
+
+        render_frame(&mut framebuffer, &frames[frame_index]);
+
+        let scale = Scale::uniform(40.0);
+        let welcome_text = "Welcome to the Cuphead Maze Game!";
+        let instruction_text = "Press Enter to Start";
+        
+        let text_width = welcome_text.len() * 20;
+        let instruction_width = instruction_text.len() * 20;
+        let x_pos = (WIDTH - text_width) / 2;
+
+        let y_pos = (HEIGHT / 3) + 350; 
+        let instruction_x_pos = (WIDTH - instruction_width) / 2;
+        let instruction_y_pos = y_pos + 80; 
+        
+        render_text(&mut framebuffer, welcome_text, x_pos, y_pos, scale, 0x000000);
+        render_text(&mut framebuffer, instruction_text, instruction_x_pos, instruction_y_pos, scale, 0x000000);
+
+        window.update_with_buffer(&framebuffer, WIDTH, HEIGHT).unwrap();
+
+        std::thread::sleep(Duration::from_millis(16));
+    }
+
+    // Música de fondo
     let background_music = AudioPlayer::new("assets/FloralFury.mp3").expect("Failed to initialize background music");
     background_music.set_volume(0.2);
     background_music.play();
 
-    // sonido para los pasos
+    // Sonido para los pasos
     let steps_sound = AudioPlayer::new("assets/footsteps.mp3").expect("Failed to initialize steps sound");
 
     let enemy_positions = vec![
@@ -390,6 +445,7 @@ fn main() {
     while window.is_open() && !window.is_key_down(Key::Escape) {
         let frame_start_time = Instant::now();
 
+        // Ahora el block_size está definido en este ámbito
         process_events(&window, &mut player, &maze, block_size, &steps_sound);
 
         framebuffer.iter_mut().for_each(|pixel| *pixel = 0);
