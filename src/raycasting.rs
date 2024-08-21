@@ -1,11 +1,11 @@
 use crate::player::Player;
 
 pub struct RayHit {
-    pub distance: f32,      // Distancia desde el jugador hasta la pared
-    pub hit_x: f32,         // Coordenada x del punto de impacto
-    pub hit_y: f32,         // Coordenada y del punto de impacto
-    pub wall_type: char,    // Símbolo de la pared golpeada ('-' o '|')
-    pub is_vertical: bool,  // Indica si la pared golpeada es vertical
+    pub distance: f32,      
+    pub hit_x: f32,         
+    pub hit_y: f32,        
+    pub wall_type: char,    
+    pub is_vertical: bool,  
 }
 
 pub fn cast_ray(
