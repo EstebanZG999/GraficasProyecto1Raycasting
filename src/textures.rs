@@ -21,8 +21,14 @@ impl Texture {
                 let r = pixel[0];
                 let g = pixel[1];
                 let b = pixel[2];
-                let color = ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
-                color_array[x as usize][y as usize] = color;
+                let a = pixel[3];  
+
+                if a == 0 {
+                    color_array[x as usize][y as usize] = 0; 
+                } else {
+                    let color = ((a as u32) << 24) | ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
+                    color_array[x as usize][y as usize] = color;
+                }
             }
         }
 
@@ -33,3 +39,4 @@ impl Texture {
         self.color_array[x as usize % self.width as usize][y as usize % self.height as usize]
     }
 }
+
